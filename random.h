@@ -2,13 +2,17 @@
 
 #include <random>
 
-namespace Random {
-    using ll = long long;
-    using namespace std;
-    ll rand_int(ll l, ll r) { //[l, r]
-        using D = uniform_int_distribution<ll>;
-        static random_device rd;
-        static mt19937 gen(rd());
-        return D(l, r)(gen);
+// TODO: uniform_int_distributionを自前実装する(環境依存性を消すため)
+struct Random {
+    std::mt19937 mt;
+    Random() {
+        mt = std::mt19937();
     }
-}
+    template<class T> T next(T a, T b) { return T(); }
+    template<> int next<int>(int a, int b) {
+        return int(next<long long>(a, b));
+    }
+    template<> long long next<long long>(long long a, long long b) {
+        return std::uniform_int_distribution<long long>(a, b)(mt);
+    }
+};
