@@ -1,18 +1,43 @@
 #pragma once
 
+#include <cassert>
+#include <cstdint>
 #include <random>
 
-// TODO: uniform_int_distributionを自前実装する(環境依存性を消すため)
+namespace algotest {
+
+namespace random {
+
 struct Random {
-    std::mt19937 mt;
-    Random() {
-        mt = std::mt19937();
+  private:
+    std::mt19937_64 mt;
+
+    // random choice from [0, upper]
+    uint64_t next(uint64_t upper) {
+        if (upper & (upper + 1)) {
+            // b = 00..0011..11
+            return mt() & upper;
+        }
+        int lg = 63 - __builtin_clzll(upper);
+        uint64_t mask = (lg == 63) ? ~0ULL : (1ULL << (lg + 1)) - 1;
+        while (true) {
+            uint64_t r = mt() & mask;
+            if (r <= upper)
+                return r;
+        }
     }
-    template<class T> T next(T a, T b) { return T(); }
-    template<> int next<int>(int a, int b) {
-        return int(next<long long>(a, b));
-    }
-    template<> long long next<long long>(long long a, long long b) {
-        return std::uniform_int_distribution<long long>(a, b)(mt);
-    }
+
+  public:
+    Random() : mt() {}
+
+    // random choice from [lower, upper]
+    template <class T>
+    T next(T lower, T upper) {
+        assert(lower <= upper);
+        return T(lower + next(uint64_t(upper - lower)));
+    };
 };
+
+}  // namespace random
+
+}  // namespace algotest

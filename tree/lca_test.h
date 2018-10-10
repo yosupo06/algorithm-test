@@ -2,36 +2,43 @@
 
 #include <vector>
 
+namespace algotest {
+
 struct LCAEdge {
     int to;
 };
 
 class LCATesterBase {
     /// 最初に一度呼ばれる。rは木の根
-    virtual void setup(std::vector<std::vector<LCAEdge>> g, int r) = 0;
+    virtual void setup(std::vector<std::vector<int>> g, int r) = 0;
+
     /// u, vのLCAの頂点番号を返す
     virtual int query(int u, int v) = 0;
 };
 
+}  // namespace algotest
+
+#include "../random.h"
 #include "gtest/gtest.h"
-#include "lca.h" // "正しい"LCAが入っている
-#include "random.h" // 乱数生成ライブラリ
+#include "lca.h"
 
-// おまじない
-template<typename LCA>
+namespace algotest {
+
+template <typename LCA>
 class LCATest : public ::testing::Test {};
-TYPED_TEST_CASE_P(LCATest);
 
+TYPED_TEST_CASE_P(LCATest);
 
 /// 小さなケースでのランダムテスト
 TYPED_TEST_P(LCATest, StressTest) {
+    auto gen = algotest::random::Random();
     using G = std::vector<std::vector<LCAEdge>>;
     auto check = [&](G g) {
         int n = int(g.size());
         TypeParam your_lca;
-        int r = Random::rand_int(0, n - 1);
+        int r = gen.next(0, n - 1);
         your_lca.setup(g, r);
-        auto my_lca = YosupoLCA::get_lca(g, r);
+        auto my_lca = algotest::lca::get_lca(g, r);
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
@@ -43,7 +50,7 @@ TYPED_TEST_P(LCATest, StressTest) {
     for (int ph = 0; ph < 100; ph++) {
         G g(20);
         for (int i = 1; i < 20; i++) {
-            int p = Random::rand_int(0, i - 1);
+            int p = gen.next(0, i - 1);
             g[i].push_back(LCAEdge{p});
             g[p].push_back(LCAEdge{i});
         }
@@ -73,5 +80,6 @@ TYPED_TEST_P(LCATest, DirectedTest) {
 }
 
 // おまじない
-REGISTER_TYPED_TEST_CASE_P(LCATest,
-        StressTest, DirectedTest);
+REGISTER_TYPED_TEST_CASE_P(LCATest, StressTest, DirectedTest);
+
+}  // namespace algotest
