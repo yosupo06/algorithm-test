@@ -10,7 +10,7 @@ struct LCAEdge {
 
 class LCATesterBase {
     /// 最初に一度呼ばれる。rは木の根
-    virtual void setup(std::vector<std::vector<int>> g, int r) = 0;
+    virtual void setup(std::vector<std::vector<LCAEdge>> g, int r) = 0;
 
     /// u, vのLCAの頂点番号を返す
     virtual int query(int u, int v) = 0;
