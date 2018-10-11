@@ -36,6 +36,15 @@ struct Random {
         assert(lower <= upper);
         return T(lower + next(uint64_t(upper - lower)));
     };
+
+    // generate random lower string that length = n
+    std::string next_lower_string(size_t n) {
+        std::string s = "";
+        for (size_t i = 0; i < n; i++) {
+            s += next('a', 'z');
+        }
+        return s;
+    }
 };
 
 }  // namespace random
