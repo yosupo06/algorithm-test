@@ -5,9 +5,9 @@
 namespace algotest {
 
 class PrimeTesterBase {
-    /// xが素因数かどうかを返す
+    /// xが素因数かどうかを返す (1 <= x <= 2e18)
     virtual bool is_prime(long long x) = 0;
-    /// xの素因数の一覧を返す
+    /// xの素因数の一覧を返す (1 <= x <= 2e18)
     virtual std::vector<long long> factor(long long x) = 0;
 };
 
@@ -23,15 +23,16 @@ class PrimeTest : public ::testing::Test {};
 
 TYPED_TEST_CASE_P(PrimeTest);
 
-
-template<class T>
+template <class T>
 bool eq_v(std::vector<T> v, std::vector<T> w) {
-    if (v.size() != w.size()) return false;
+    if (v.size() != w.size())
+        return false;
     sort(begin(v), end(v));
     sort(begin(w), end(w));
     int n = int(v.size());
     for (int i = 0; i < n; i++) {
-        if (v[i] != w[i]) return false;
+        if (v[i] != w[i])
+            return false;
     }
     return true;
 }
@@ -50,9 +51,9 @@ TYPED_TEST_P(PrimeTest, IsPrimeTest) {
 TYPED_TEST_P(PrimeTest, PollardTest) {
     TypeParam your_prime;
     ASSERT_TRUE(eq_v(your_prime.factor(12), {2, 2, 3}));
-    ASSERT_TRUE(eq_v(your_prime.factor(1000000007LL*1000000009LL), {1000000007LL, 1000000009LL}));
+    ASSERT_TRUE(eq_v(your_prime.factor(1000000007LL * 1000000009LL),
+                     {1000000007LL, 1000000009LL}));
 }
-
 
 REGISTER_TYPED_TEST_CASE_P(PrimeTest, IsPrimeTest, PollardTest);
 
