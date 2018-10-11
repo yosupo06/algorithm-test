@@ -66,6 +66,10 @@ TYPED_TEST_P(PrimeTest, PollardBigTest) {
                      {1000000007LL, 1000000009LL}));
 }
 
-REGISTER_TYPED_TEST_CASE_P(PrimeTest, IsPrimeTest, PollardTest);
+REGISTER_TYPED_TEST_CASE_P(PrimeTest,
+                           IsPrimeTest,
+                           PollardTest,
+                           IsPrimeBigTest,
+                           PollardBigTest);
 
 }  // namespace algotest
