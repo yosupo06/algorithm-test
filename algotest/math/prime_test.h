@@ -44,13 +44,24 @@ TYPED_TEST_P(PrimeTest, IsPrimeTest) {
     ASSERT_TRUE(your_prime.is_prime(3));
     ASSERT_FALSE(your_prime.is_prime(4));
     ASSERT_TRUE(your_prime.is_prime(5));
-    ASSERT_TRUE(your_prime.is_prime(1000000007));
-    ASSERT_FALSE(your_prime.is_prime(1000000007LL * 1000000009LL));
+    ASSERT_TRUE(your_prime.is_prime(103));
+    ASSERT_FALSE(your_prime.is_prime(103 * 107));
 }
 
 TYPED_TEST_P(PrimeTest, PollardTest) {
     TypeParam your_prime;
     ASSERT_TRUE(eq_v(your_prime.factor(12), {2, 2, 3}));
+    ASSERT_TRUE(eq_v(your_prime.factor(103 * 107), {103LL, 107LL}));
+}
+
+TYPED_TEST_P(PrimeTest, IsPrimeBigTest) {
+    TypeParam your_prime;
+    ASSERT_TRUE(your_prime.is_prime(1000000000000000003LL));
+    ASSERT_FALSE(your_prime.is_prime(1000000007LL * 1000000009LL));
+}
+
+TYPED_TEST_P(PrimeTest, PollardBigTest) {
+    TypeParam your_prime;
     ASSERT_TRUE(eq_v(your_prime.factor(1000000007LL * 1000000009LL),
                      {1000000007LL, 1000000009LL}));
 }
