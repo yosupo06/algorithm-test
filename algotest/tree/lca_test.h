@@ -36,7 +36,7 @@ TYPED_TEST_P(LCATest, StressTest) {
     auto check = [&](G g) {
         int n = int(g.size());
         TypeParam your_lca;
-        int r = gen.next(0, n - 1);
+        int r = gen.uniform(0, n - 1);
         your_lca.setup(g, r);
         auto my_lca = algotest::lca::get_lca(g, r);
 
@@ -50,7 +50,7 @@ TYPED_TEST_P(LCATest, StressTest) {
     for (int ph = 0; ph < 100; ph++) {
         G g(20);
         for (int i = 1; i < 20; i++) {
-            int p = gen.next(0, i - 1);
+            int p = gen.uniform(0, i - 1);
             g[i].push_back(LCAEdge{p});
             g[p].push_back(LCAEdge{i});
         }

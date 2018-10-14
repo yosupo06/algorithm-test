@@ -48,25 +48,25 @@ TYPED_TEST_P(FenwickTest, StressTest) {
     auto gen = algotest::random::Random();
     for (int tc = 0; tc < 100; tc++) {
         TypeParam your_fenwick;
-        int n = gen.next(1, 100);
+        int n = gen.uniform(1, 100);
         std::vector<long long> a(n);
         for (int i = 0; i < n; i++) {
-            a[i] = gen.next(0, 1000000000);
+            a[i] = gen.uniform(0, 1000000000);
         }
         your_fenwick.setup(a);
         FenwickNaive fw(a);
-        int q = gen.next(1, 100);
+        int q = gen.uniform(1, 100);
         for (int ph = 0; ph < q; ph++) {
-            int ty = gen.next(0, 1);
+            int ty = gen.uniform(0, 1);
             if (ty == 0) {
                 // add
-                int k = gen.next(0, n - 1);
-                long long x = gen.next(0, 1000000000);
+                int k = gen.uniform(0, n - 1);
+                long long x = gen.uniform(0, 1000000000);
                 your_fenwick.add(k, x);
                 fw.add(k, x);
             } else {
-                int a = gen.next(0, n - 1);
-                int b = gen.next(0, n - 1);
+                int a = gen.uniform(0, n - 1);
+                int b = gen.uniform(0, n - 1);
                 if (a > b)
                     std::swap(a, b);
                 b++;

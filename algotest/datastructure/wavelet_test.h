@@ -53,21 +53,21 @@ TYPED_TEST_P(WaveletTest, RankStressTest) {
     auto gen = algotest::random::Random();
     for (int tc = 0; tc < 100; tc++) {
         TypeParam your_wavelet;
-        int n = gen.next(1, 100);
+        int n = gen.uniform(1, 100);
         std::vector<int> v(n);
         for (int i = 0; i < n; i++) {
-            v[i] = gen.next(0, n - 1);
+            v[i] = gen.uniform(0, n - 1);
         }
         your_wavelet.setup(v);
         WaveletNaive wt(v);
-        int q = gen.next(1, 100);
+        int q = gen.uniform(1, 100);
         for (int ph = 0; ph < q; ph++) {
-            int a = gen.next(0, n - 1);
-            int b = gen.next(0, n - 1);
+            int a = gen.uniform(0, n - 1);
+            int b = gen.uniform(0, n - 1);
             if (a > b)
                 std::swap(a, b);
             b++;
-            int u = gen.next(0, 100);
+            int u = gen.uniform(0, 100);
             EXPECT_EQ(wt.rank(a, b, u), wt.rank(a, b, u));
         }
     }
@@ -77,21 +77,21 @@ TYPED_TEST_P(WaveletTest, SelectStressTest) {
     auto gen = algotest::random::Random();
     for (int tc = 0; tc < 100; tc++) {
         TypeParam your_wavelet;
-        int n = gen.next(1, 100);
+        int n = gen.uniform(1, 100);
         std::vector<int> v(n);
         for (int i = 0; i < n; i++) {
-            v[i] = gen.next(0, n - 1);
+            v[i] = gen.uniform(0, n - 1);
         }
         your_wavelet.setup(v);
         WaveletNaive wt(v);
-        int q = gen.next(1, 100);
+        int q = gen.uniform(1, 100);
         for (int ph = 0; ph < q; ph++) {
-            int a = gen.next(0, n - 1);
-            int b = gen.next(0, n - 1);
+            int a = gen.uniform(0, n - 1);
+            int b = gen.uniform(0, n - 1);
             if (a > b)
                 std::swap(a, b);
             b++;
-            int k = gen.next(0, b - a - 1);
+            int k = gen.uniform(0, b - a - 1);
             EXPECT_EQ(wt.select(a, b, k), wt.select(a, b, k));
         }
     }

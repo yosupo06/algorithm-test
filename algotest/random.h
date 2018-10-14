@@ -1,7 +1,9 @@
 #pragma once
 
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <numeric>
 #include <random>
 
 namespace algotest {
@@ -32,18 +34,40 @@ struct Random {
 
     // random choice from [lower, upper]
     template <class T>
-    T next(T lower, T upper) {
+    T uniform(T lower, T upper) {
         assert(lower <= upper);
         return T(lower + next(uint64_t(upper - lower)));
     };
 
+    bool uniform01() { return uniform(0, 1) == 1; }
+
     // generate random lower string that length = n
-    std::string next_lower_string(size_t n) {
+    std::string lower_string(size_t n) {
         std::string s = "";
         for (size_t i = 0; i < n; i++) {
-            s += next('a', 'z');
+            s += uniform('a', 'z');
         }
         return s;
+    }
+
+    // random shuffle
+    template <class Iter>
+    void shuffle(Iter first, Iter last) {
+        int len = 0;
+        // Reference and edit:
+        // cpprefjp - C++日本語リファレンス(https://cpprefjp.github.io/reference/algorithm/shuffle.html)
+        for (auto it = first + 1; it != last; it++) {
+            len++;
+            iter_swap(it, first + uniform(0, len - 1));
+        }
+    }
+
+    // generate random permutation that length = n
+    std::vector<int> perm(int n) {
+        std::vector<int> idx(n);
+        std::iota(idx.begin(), idx.end(), 0);
+        shuffle(idx.begin(), idx.end());
+        return idx;
     }
 };
 
