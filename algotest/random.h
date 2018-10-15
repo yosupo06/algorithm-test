@@ -37,7 +37,7 @@ struct Random {
     T uniform(T lower, T upper) {
         assert(lower <= upper);
         return T(lower + next(uint64_t(upper - lower)));
-    };
+    }
 
     bool uniform01() { return uniform(0, 1) == 1; }
 
