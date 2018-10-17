@@ -16,7 +16,7 @@ struct Random {
 
     // random choice from [0, upper]
     uint64_t next(uint64_t upper) {
-        if (upper & (upper + 1)) {
+        if (!(upper & (upper + 1))) {
             // b = 00..0011..11
             return mt() & upper;
         }

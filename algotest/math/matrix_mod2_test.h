@@ -5,17 +5,14 @@
 
 namespace algotest {
 
-class MatrixModTesterBase {
-  public:
-    static constexpr long long kMod = 1e9 + 7;
-
+class MatrixMod2TesterBase {
   private:
-    // matのrankを返す(MOD 1e9+7)
-    virtual int rank(std::vector<std::vector<long long>> mat) = 0;
-    // mat * x = vecなるxを返す(MOD 1e9+7)
-    virtual std::vector<long long> linear_equation(
-        std::vector<std::vector<long long>> mat,
-        std::vector<long long> vec) = 0;
+    // matのrankを返す(MOD 2)
+    virtual int rank(std::vector<std::vector<int>> mat) = 0;
+    // mat * x = vecなるxを返す(MOD 2)
+    virtual std::vector<int> linear_equation(
+        std::vector<std::vector<int>> mat,
+        std::vector<int> vec) = 0;
 };
 
 }  // namespace algotest
@@ -25,15 +22,13 @@ class MatrixModTesterBase {
 namespace algotest {
 
 template <class MATRIX>
-class MatrixModTest : public ::testing::Test {};
+class MatrixMod2Test : public ::testing::Test {};
 
-TYPED_TEST_CASE_P(MatrixModTest);
+TYPED_TEST_CASE_P(MatrixMod2Test);
 
-TYPED_TEST_P(MatrixModTest, RankStressTest) {
-    using ll = long long;
-    using Vec = std::vector<ll>;
+TYPED_TEST_P(MatrixMod2Test, RankStressTest) {
+    using Vec = std::vector<int>;
     using Mat = std::vector<Vec>;
-    constexpr ll kMod = MatrixModTesterBase::kMod;
 
     TypeParam your_mat;
     algotest::random::Random gen;
@@ -45,15 +40,14 @@ TYPED_TEST_P(MatrixModTest, RankStressTest) {
         for (int i = 0; i < k; i++) {
             mat[i][i] = 1;
             for (int j = i + 1; j < m; j++) {
-                mat[i][j] = gen.uniform(0LL, kMod - 1);
+                mat[i][j] = gen.uniform01();
             }
         }
         for (int i = k; i < n; i++) {
             for (int j = 0; j < k; j++) {
-                ll freq = gen.uniform(0LL, kMod - 1);
+                int freq = gen.uniform01();
                 for (int k = 0; k < m; k++) {
-                    mat[i][k] += freq * mat[j][k];
-                    mat[i][k] %= kMod;
+                    mat[i][k] ^= freq * mat[j][k];
                 }
             }
         }
@@ -61,17 +55,14 @@ TYPED_TEST_P(MatrixModTest, RankStressTest) {
         for (int tm = 0; tm < 100; tm++) {
             int a = gen.uniform(0, n - 1);
             int b = gen.uniform(0, n - 1);
-            ll freq = gen.uniform(0LL, kMod - 1);
-            if (a == b && freq == kMod - 1) continue;
+            if (a == b) continue;
             if (gen.uniform01()) {
                 for (int i = 0; i < m; i++) {
-                    mat[a][i] += freq * mat[b][i];
-                    mat[a][i] %= kMod;
+                    mat[a][i] ^= mat[b][i];
                 }
             } else {
                 for (int i = 0; i < n; i++) {
-                    mat[i][a] += freq * mat[i][b];
-                    mat[i][a] %= kMod;
+                    mat[i][a] ^= mat[i][b];
                 }
             }
         }
@@ -91,11 +82,9 @@ TYPED_TEST_P(MatrixModTest, RankStressTest) {
     }
 }
 
-TYPED_TEST_P(MatrixModTest, LinearEquationStressTest) {
-    using ll = long long;
-    using Vec = std::vector<ll>;
+TYPED_TEST_P(MatrixMod2Test, LinearEquationStressTest) {
+    using Vec = std::vector<int>;
     using Mat = std::vector<Vec>;
-    constexpr ll kMod = MatrixModTesterBase::kMod;
 
     TypeParam your_mat;
     algotest::random::Random gen;
@@ -106,17 +95,16 @@ TYPED_TEST_P(MatrixModTest, LinearEquationStressTest) {
         Vec ans(m);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                mat[i][j] = gen.uniform(0LL, kMod - 1);
+                mat[i][j] = gen.uniform01();
             }
         }
         for (int j = 0; j < m; j++) {
-            ans[j] = gen.uniform(0LL, kMod - 1);
+            ans[j] = gen.uniform01();
         }
         Vec vec(n);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                vec[i] += mat[i][j] * ans[j];
-                vec[i] %= kMod;
+                vec[i] ^= mat[i][j] * ans[j];
             }
         }
         auto out = your_mat.linear_equation(mat, vec);
@@ -124,15 +112,14 @@ TYPED_TEST_P(MatrixModTest, LinearEquationStressTest) {
         Vec vec2(n);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                vec2[i] += mat[i][j] * out[j];
-                vec2[i] %= kMod;
+                vec2[i] ^= mat[i][j] * out[j];
             }
         }
         ASSERT_EQ(vec, vec2);
     }
 }
 
-REGISTER_TYPED_TEST_CASE_P(MatrixModTest,
+REGISTER_TYPED_TEST_CASE_P(MatrixMod2Test,
                            RankStressTest,
                            LinearEquationStressTest);
 
