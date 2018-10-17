@@ -55,10 +55,13 @@ struct Random {
     void shuffle(Iter first, Iter last) {
         int len = 0;
         // Reference and edit:
-        // cpprefjp - C++日本語リファレンス(https://cpprefjp.github.io/reference/algorithm/shuffle.html)
+        // cpprefjp - C++日本語リファレンス
+        // (https://cpprefjp.github.io/reference/algorithm/shuffle.html)
         for (auto it = first + 1; it != last; it++) {
             len++;
-            iter_swap(it, first + uniform(0, len - 1));
+            int j = uniform(0, len - 1);
+            if (j != len - 1)
+                iter_swap(it, first + j);
         }
     }
 

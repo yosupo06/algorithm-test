@@ -62,7 +62,8 @@ TYPED_TEST_P(MatrixModTest, RankStressTest) {
             int a = gen.uniform(0, n - 1);
             int b = gen.uniform(0, n - 1);
             ll freq = gen.uniform(0LL, kMod - 1);
-            if (a == b && freq == kMod - 1) continue;
+            if (a == b && freq == kMod - 1)
+                continue;
             if (gen.uniform01()) {
                 for (int i = 0; i < m; i++) {
                     mat[a][i] += freq * mat[b][i];

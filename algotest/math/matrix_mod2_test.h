@@ -10,9 +10,8 @@ class MatrixMod2TesterBase {
     // matのrankを返す(MOD 2)
     virtual int rank(std::vector<std::vector<int>> mat) = 0;
     // mat * x = vecなるxを返す(MOD 2)
-    virtual std::vector<int> linear_equation(
-        std::vector<std::vector<int>> mat,
-        std::vector<int> vec) = 0;
+    virtual std::vector<int> linear_equation(std::vector<std::vector<int>> mat,
+                                             std::vector<int> vec) = 0;
 };
 
 }  // namespace algotest
@@ -55,7 +54,8 @@ TYPED_TEST_P(MatrixMod2Test, RankStressTest) {
         for (int tm = 0; tm < 100; tm++) {
             int a = gen.uniform(0, n - 1);
             int b = gen.uniform(0, n - 1);
-            if (a == b) continue;
+            if (a == b)
+                continue;
             if (gen.uniform01()) {
                 for (int i = 0; i < m; i++) {
                     mat[a][i] ^= mat[b][i];
