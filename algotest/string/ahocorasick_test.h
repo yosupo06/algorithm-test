@@ -32,7 +32,7 @@ TYPED_TEST_P(AhoCorasickTest, StressTest) {
     TypeParam your_ahocorasick;
     auto gen = algotest::random::Random();
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 300; i++) {
         int n = gen.uniform(1, 100);
         int m = gen.uniform(1, 20);
         std::string target = gen.lower_string(n);
