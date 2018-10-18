@@ -63,6 +63,23 @@ TYPED_TEST_P(AhoCorasickTest, StressTest) {
     }
 }
 
-REGISTER_TYPED_TEST_CASE_P(AhoCorasickTest, StressTest);
+TYPED_TEST_P(AhoCorasickTest, SkipFailureLinkTest) {
+    TypeParam your_ahocorasick;
+
+    auto target = std::string(1000000, 'a');
+    std::vector<std::string> patterns(2);
+    patterns[0] = std::string(1, 'a');
+    patterns[1] = std::string(999999, 'a');
+    std::vector<std::vector<int>> ans(2);
+    for (int i = 0; i < 1000000; i++)
+        ans[0].push_back(i);
+    for (int i = 0; i < 2; i++)
+        ans[1].push_back(i);
+
+    auto out = your_ahocorasick.enumerate(target, patterns);
+    ASSERT_EQ(ans, out);
+}
+
+REGISTER_TYPED_TEST_CASE_P(AhoCorasickTest, StressTest, SkipFailureLinkTest);
 
 }  // namespace algotest
