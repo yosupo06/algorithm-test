@@ -33,7 +33,13 @@ TYPED_TEST_CASE_P(LCATest);
 TYPED_TEST_P(LCATest, StressTest) {
     auto gen = algotest::random::Random();
     using G = std::vector<std::vector<LCAEdge>>;
-    auto check = [&](G g) {
+    for (int ph = 0; ph < 100; ph++) {
+        G g(20);
+        for (int i = 1; i < 20; i++) {
+            int p = gen.uniform(0, i - 1);
+            g[i].push_back(LCAEdge{p});
+            g[p].push_back(LCAEdge{i});
+        }
         int n = int(g.size());
         TypeParam your_lca;
         int r = gen.uniform(0, n - 1);
@@ -45,16 +51,6 @@ TYPED_TEST_P(LCATest, StressTest) {
                 ASSERT_EQ(your_lca.query(i, j), my_lca.query(i, j));
             }
         }
-    };
-
-    for (int ph = 0; ph < 100; ph++) {
-        G g(20);
-        for (int i = 1; i < 20; i++) {
-            int p = gen.uniform(0, i - 1);
-            g[i].push_back(LCAEdge{p});
-            g[p].push_back(LCAEdge{i});
-        }
-        check(g);
     }
 }
 
