@@ -21,14 +21,13 @@ class MinCostFlowDoubleTesterBase {
         int s,
         int t) = 0;
 };
- constexpr double MinCostFlowDoubleTesterBase::kWarnErr;
- constexpr double MinCostFlowDoubleTesterBase::kAssertErr;
-
+constexpr double MinCostFlowDoubleTesterBase::kWarnErr;
+constexpr double MinCostFlowDoubleTesterBase::kAssertErr;
 
 }  // namespace algotest
 
-#include "../random.h"
 #include "../comparator.h"
+#include "../random.h"
 #include "algotest/graph/mincostflow.h"
 #include "gtest/gtest.h"
 
@@ -76,7 +75,8 @@ class MCFDCorrect : MinCostFlowDoubleTesterBase {
             for (auto e : elist[i]) {
                 if (!e.cap || res.dual[i] == decltype(res)::INF)
                     continue;
-                sm -= max<double>(0, (res.dual[e.to] - res.dual[i]) - e.dist) * e.cap;
+                sm -= max<double>(0, (res.dual[e.to] - res.dual[i]) - e.dist) *
+                      e.cap;
             }
         }
         assert(comparator::approx_equal(res.flow, sm, kWarnErr));
@@ -119,14 +119,14 @@ TYPED_TEST_P(MinCostFlowDoubleTest, StressTest) {
         mincostflow::MCFDCorrect ans_mcf;
         double ans = ans_mcf.max_flow_min_cost(g, s, t);
         double out = your_mcf.max_flow_min_cost(g, s, t);
-        EXPECT_PRED3(comparator::approx_equal, ans, out
-                     , MinCostFlowDoubleTesterBase::kWarnErr);
-        ASSERT_PRED3(comparator::approx_equal, ans, out, MinCostFlowDoubleTesterBase::kAssertErr);
+        EXPECT_PRED3(comparator::approx_equal, ans, out,
+                     MinCostFlowDoubleTesterBase::kWarnErr);
+        ASSERT_PRED3(comparator::approx_equal, ans, out,
+                     MinCostFlowDoubleTesterBase::kAssertErr);
     }
 }
 
 // おまじない
-REGISTER_TYPED_TEST_CASE_P(MinCostFlowDoubleTest,
-                           StressTest);
+REGISTER_TYPED_TEST_CASE_P(MinCostFlowDoubleTest, StressTest);
 
 }  // namespace algotest
