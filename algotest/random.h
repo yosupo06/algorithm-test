@@ -39,7 +39,12 @@ struct Random {
         return T(lower + next(uint64_t(upper - lower)));
     }
 
-    bool uniform01() { return uniform(0, 1) == 1; }
+    bool uniform_bool() { return uniform(0, 1) == 1; }
+
+    double uniform01() {
+        uint64_t v = next(1ULL << 63);
+        return double(v) / (1ULL << 63);
+    }
 
     // generate random lower string that length = n
     std::string lower_string(size_t n) {

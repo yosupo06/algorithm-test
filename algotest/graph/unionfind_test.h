@@ -59,7 +59,7 @@ TYPED_TEST_P(UnionFindTest, StressTest) {
         TypeParam your_uf;
         your_uf.setup(n);
         for (int i = 0; i < q; i++) {
-            if (gen.uniform01()) {
+            if (gen.uniform_bool()) {
                 //add
                 int a = gen.uniform(0, n-1);
                 int b = gen.uniform(0, n-1);

@@ -41,7 +41,7 @@ TYPED_TEST_P(AhoCorasickTest, StressTest) {
         std::string target = gen.lower_string(n);
         std::vector<std::string> patterns(m);
         for (int j = 0; j < m; j++) {
-            if (gen.uniform01()) {
+            if (gen.uniform_bool()) {
                 patterns[j] = gen.lower_string(10);
             } else {
                 int di = gen.uniform(1, n);

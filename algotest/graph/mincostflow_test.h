@@ -80,7 +80,24 @@ class MCFCorrect : MinCostFlowTesterBase {
 
 }  // namespace mincostflow
 
-TYPED_TEST_P(MinCostFlowTest, StressTest) {
+TYPED_TEST_P(MinCostFlowTest, IssueNegative) {
+    using G = std::vector<std::vector<MinCostFlowEdge>>;
+
+    int n = 3;
+    int s = 1;
+    int t = 0;
+    G g(n);
+    g[1].push_back(MinCostFlowEdge{0, 86, 58});
+    g[1].push_back(MinCostFlowEdge{0, 82, 65});
+    g[2].push_back(MinCostFlowEdge{1, 79, 100});
+    g[2].push_back(MinCostFlowEdge{1, 90, 42});
+    TypeParam your_mcf;
+    mincostflow::MCFCorrect ans_mcf;
+    ASSERT_EQ(ans_mcf.max_flow_min_cost(g, s, t),
+              your_mcf.max_flow_min_cost(g, s, t));
+}
+
+TYPED_TEST_P(MinCostFlowTest, StressTestSmall) {
     algotest::random::Random gen;
     using G = std::vector<std::vector<MinCostFlowEdge>>;
 
@@ -116,7 +133,46 @@ TYPED_TEST_P(MinCostFlowTest, StressTest) {
     }
 }
 
+TYPED_TEST_P(MinCostFlowTest, StressTest) {
+    algotest::random::Random gen;
+    using G = std::vector<std::vector<MinCostFlowEdge>>;
+
+    for (int ph = 0; ph < 300; ph++) {
+        int n = gen.uniform(1, 200);
+        int m = gen.uniform(0, 300);
+        int s, t;
+        while (true) {
+            s = gen.uniform(0, n - 1);
+            t = gen.uniform(0, n - 1);
+            if (s != t)
+                break;
+        }
+        G g(n);
+
+        for (int i = 0; i < m; i++) {
+            int x, y;
+            while (true) {
+                x = gen.uniform(0, n - 1);
+                y = gen.uniform(0, n - 1);
+                if (x == y)
+                    continue;
+                break;
+            }
+            int cap = gen.uniform(0, 100);
+            long long cost = gen.uniform(0, 100);
+            g[x].push_back(MinCostFlowEdge{y, cap, cost});
+        }
+        TypeParam your_mcf;
+        mincostflow::MCFCorrect ans_mcf;
+        ASSERT_EQ(ans_mcf.max_flow_min_cost(g, s, t),
+                  your_mcf.max_flow_min_cost(g, s, t));
+    }
+}
+
 // おまじない
-REGISTER_TYPED_TEST_CASE_P(MinCostFlowTest, StressTest);
+REGISTER_TYPED_TEST_CASE_P(MinCostFlowTest,
+                           IssueNegative,
+                           StressTestSmall,
+                           StressTest);
 
 }  // namespace algotest

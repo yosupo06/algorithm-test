@@ -39,12 +39,12 @@ TYPED_TEST_P(MatrixMod2Test, RankStressTest) {
         for (int i = 0; i < k; i++) {
             mat[i][i] = 1;
             for (int j = i + 1; j < m; j++) {
-                mat[i][j] = gen.uniform01();
+                mat[i][j] = gen.uniform_bool();
             }
         }
         for (int i = k; i < n; i++) {
             for (int j = 0; j < k; j++) {
-                int freq = gen.uniform01();
+                int freq = gen.uniform_bool();
                 for (int k = 0; k < m; k++) {
                     mat[i][k] ^= freq * mat[j][k];
                 }
@@ -56,7 +56,7 @@ TYPED_TEST_P(MatrixMod2Test, RankStressTest) {
             int b = gen.uniform(0, n - 1);
             if (a == b)
                 continue;
-            if (gen.uniform01()) {
+            if (gen.uniform_bool()) {
                 for (int i = 0; i < m; i++) {
                     mat[a][i] ^= mat[b][i];
                 }
@@ -67,7 +67,7 @@ TYPED_TEST_P(MatrixMod2Test, RankStressTest) {
             }
         }
 
-        if (gen.uniform01()) {
+        if (gen.uniform_bool()) {
             // trans
             Mat _mat = mat;
             mat = Mat(m, Vec(n));
@@ -95,11 +95,11 @@ TYPED_TEST_P(MatrixMod2Test, LinearEquationStressTest) {
         Vec ans(m);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                mat[i][j] = gen.uniform01();
+                mat[i][j] = gen.uniform_bool();
             }
         }
         for (int j = 0; j < m; j++) {
-            ans[j] = gen.uniform01();
+            ans[j] = gen.uniform_bool();
         }
         Vec vec(n);
         for (int i = 0; i < n; i++) {

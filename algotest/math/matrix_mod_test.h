@@ -64,7 +64,7 @@ TYPED_TEST_P(MatrixModTest, RankStressTest) {
             ll freq = gen.uniform(0LL, kMod - 1);
             if (a == b && freq == kMod - 1)
                 continue;
-            if (gen.uniform01()) {
+            if (gen.uniform_bool()) {
                 for (int i = 0; i < m; i++) {
                     mat[a][i] += freq * mat[b][i];
                     mat[a][i] %= kMod;
@@ -77,7 +77,7 @@ TYPED_TEST_P(MatrixModTest, RankStressTest) {
             }
         }
 
-        if (gen.uniform01()) {
+        if (gen.uniform_bool()) {
             // trans
             Mat _mat = mat;
             mat = Mat(m, Vec(n));
