@@ -17,7 +17,9 @@ class MatrixModTesterBase {
     virtual std::vector<long long> linear_equation(
         std::vector<std::vector<long long>> mat,
         std::vector<long long> vec) = 0;
-
+    // inverse
+    virtual std::vector<std::vector<long long>> inverse(
+        std::vector<std::vector<long long>> mat) = 0;
 };
 
 }  // namespace algotest
@@ -118,7 +120,8 @@ TYPED_TEST_P(MatrixModTest, DetStressTest) {
             int a = gen.uniform(0, n - 1);
             int b = gen.uniform(0, n - 1);
             ll freq = gen.uniform(0LL, kMod - 1);
-            if (a == b) continue;
+            if (a == b)
+                continue;
             if (gen.uniform_bool()) {
                 for (int i = 0; i < n; i++) {
                     mat[a][i] += freq * mat[b][i];
@@ -177,9 +180,64 @@ TYPED_TEST_P(MatrixModTest, LinearEquationStressTest) {
     }
 }
 
+TYPED_TEST_P(MatrixModTest, InverseStressTest) {
+    using ll = long long;
+    using Vec = std::vector<ll>;
+    using Mat = std::vector<Vec>;
+    constexpr ll kMod = MatrixModTesterBase::kMod;
+
+    TypeParam your_mat;
+    algotest::random::Random gen;
+    for (int ph = 0; ph < 200; ph++) {
+        int n = gen.uniform(1, 20);
+        Mat mat = Mat(n, Vec(n));
+        ll base = 1;
+        for (int i = 0; i < n; i++) {
+            mat[i][i] = gen.uniform(1LL, kMod - 1);
+            base *= mat[i][i];
+            base %= kMod;
+            for (int j = i + 1; j < n; j++) {
+                mat[i][j] = gen.uniform(0LL, kMod - 1);
+            }
+        }
+        for (int tm = 0; tm < 100; tm++) {
+            int a = gen.uniform(0, n - 1);
+            int b = gen.uniform(0, n - 1);
+            ll freq = gen.uniform(0LL, kMod - 1);
+            if (a == b)
+                continue;
+            if (gen.uniform_bool()) {
+                for (int i = 0; i < n; i++) {
+                    mat[a][i] += freq * mat[b][i];
+                    mat[a][i] %= kMod;
+                }
+            } else {
+                for (int i = 0; i < n; i++) {
+                    mat[i][a] += freq * mat[i][b];
+                    mat[i][a] %= kMod;
+                }
+            }
+        }
+        auto out = your_mat.inverse(mat);
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                ll sm = 0;
+                for (int k = 0; k < n; k++) {
+                    sm += mat[i][k] * out[k][j];
+                    sm %= kMod;
+                }
+                ll exp = (i == j) ? 1LL : 0LL;
+                ASSERT_EQ(exp, sm);
+            }
+        }
+    }
+}
+
 REGISTER_TYPED_TEST_CASE_P(MatrixModTest,
                            RankStressTest,
                            DetStressTest,
-                           LinearEquationStressTest);
+                           LinearEquationStressTest,
+                           InverseStressTest);
 
 }  // namespace algotest
