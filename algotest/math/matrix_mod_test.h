@@ -12,10 +12,12 @@ class MatrixModTesterBase {
   private:
     // matのrankを返す(MOD 1e9+7)
     virtual int rank(std::vector<std::vector<long long>> mat) = 0;
+    virtual long long det(std::vector<std::vector<long long>> mat) = 0;
     // mat * x = vecなるxを返す(MOD 1e9+7)
     virtual std::vector<long long> linear_equation(
         std::vector<std::vector<long long>> mat,
         std::vector<long long> vec) = 0;
+
 };
 
 }  // namespace algotest
@@ -92,6 +94,48 @@ TYPED_TEST_P(MatrixModTest, RankStressTest) {
     }
 }
 
+TYPED_TEST_P(MatrixModTest, DetStressTest) {
+    using ll = long long;
+    using Vec = std::vector<ll>;
+    using Mat = std::vector<Vec>;
+    constexpr ll kMod = MatrixModTesterBase::kMod;
+
+    TypeParam your_mat;
+    algotest::random::Random gen;
+    for (int ph = 0; ph < 200; ph++) {
+        int n = gen.uniform(1, 20);
+        Mat mat = Mat(n, Vec(n));
+        ll base = 1;
+        for (int i = 0; i < n; i++) {
+            mat[i][i] = gen.uniform(1LL, kMod - 1);
+            base *= mat[i][i];
+            base %= kMod;
+            for (int j = i + 1; j < n; j++) {
+                mat[i][j] = gen.uniform(0LL, kMod - 1);
+            }
+        }
+        for (int tm = 0; tm < 100; tm++) {
+            int a = gen.uniform(0, n - 1);
+            int b = gen.uniform(0, n - 1);
+            ll freq = gen.uniform(0LL, kMod - 1);
+            if (a == b) continue;
+            if (gen.uniform_bool()) {
+                for (int i = 0; i < n; i++) {
+                    mat[a][i] += freq * mat[b][i];
+                    mat[a][i] %= kMod;
+                }
+            } else {
+                for (int i = 0; i < n; i++) {
+                    mat[i][a] += freq * mat[i][b];
+                    mat[i][a] %= kMod;
+                }
+            }
+        }
+
+        ASSERT_EQ(your_mat.det(mat), base);
+    }
+}
+
 TYPED_TEST_P(MatrixModTest, LinearEquationStressTest) {
     using ll = long long;
     using Vec = std::vector<ll>;
@@ -135,6 +179,7 @@ TYPED_TEST_P(MatrixModTest, LinearEquationStressTest) {
 
 REGISTER_TYPED_TEST_CASE_P(MatrixModTest,
                            RankStressTest,
+                           DetStressTest,
                            LinearEquationStressTest);
 
 }  // namespace algotest
