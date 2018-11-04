@@ -76,8 +76,9 @@ TYPED_TEST_P(SCCTest, StressTest) {
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (naive[i][j])
+                if (naive[i][j]) {
                     ASSERT_TRUE(order[i] <= order[j]);
+                }
             }
         }
     }
