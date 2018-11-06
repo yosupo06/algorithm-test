@@ -25,58 +25,63 @@ class MatrixMod2Test : public ::testing::Test {};
 
 TYPED_TEST_CASE_P(MatrixMod2Test);
 
-TYPED_TEST_P(MatrixMod2Test, RankStressTest) {
-    using Vec = std::vector<int>;
-    using Mat = std::vector<Vec>;
+namespace matrixmod2 {
+using Vec = std::vector<int>;
+using Mat = std::vector<Vec>;
 
-    TypeParam your_mat;
-    algotest::random::Random gen;
-    for (int ph = 0; ph < 200; ph++) {
-        int n = gen.uniform(1, 20);
-        int m = gen.uniform(n, 20);
-        int k = gen.uniform(1, n);
-        Mat mat = Mat(n, Vec(m));
-        for (int i = 0; i < k; i++) {
-            mat[i][i] = 1;
-            for (int j = i + 1; j < m; j++) {
-                mat[i][j] = gen.uniform_bool();
+template <class RNG>
+Mat uniform_mat(int n, int m, int k, RNG& gen) {
+    assert(k <= std::min(n, m));
+    Mat mat = Mat(n, Vec(m));
+    for (int i = 0; i < k; i++) {
+        mat[i][i] = 1;
+        for (int j = i + 1; j < m; j++) {
+            mat[i][j] = gen.uniform_bool();
+        }
+    }
+    for (int i = k; i < n; i++) {
+        for (int j = 0; j < k; j++) {
+            int freq = gen.uniform_bool();
+            for (int k = 0; k < m; k++) {
+                mat[i][k] ^= freq * mat[j][k];
             }
         }
-        for (int i = k; i < n; i++) {
-            for (int j = 0; j < k; j++) {
-                int freq = gen.uniform_bool();
-                for (int k = 0; k < m; k++) {
-                    mat[i][k] ^= freq * mat[j][k];
-                }
-            }
-        }
+    }
 
-        for (int tm = 0; tm < 100; tm++) {
+    for (int tm = 0; tm < (n + m) * 10; tm++) {
+        if (gen.uniform_bool()) {
             int a = gen.uniform(0, n - 1);
             int b = gen.uniform(0, n - 1);
             if (a == b)
                 continue;
-            if (gen.uniform_bool()) {
-                for (int i = 0; i < m; i++) {
-                    mat[a][i] ^= mat[b][i];
-                }
-            } else {
-                for (int i = 0; i < n; i++) {
-                    mat[i][a] ^= mat[i][b];
-                }
+            for (int i = 0; i < m; i++) {
+                mat[a][i] ^= mat[b][i];
             }
-        }
-
-        if (gen.uniform_bool()) {
-            // trans
-            Mat _mat = mat;
-            mat = Mat(m, Vec(n));
+        } else {
+            int a = gen.uniform(0, m - 1);
+            int b = gen.uniform(0, m - 1);
+            if (a == b)
+                continue;
             for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    mat[j][i] = _mat[i][j];
-                }
+                mat[i][a] ^= mat[i][b];
             }
         }
+    }
+
+    return mat;
+}
+
+}  // namespace matrixmod2
+
+TYPED_TEST_P(MatrixMod2Test, RankStressTest) {
+    TypeParam your_mat;
+    algotest::random::Random gen;
+    for (int ph = 0; ph < 200; ph++) {
+        int n = gen.uniform(1, 20);
+        int m = gen.uniform(1, 20);
+        int k = gen.uniform(1, std::min(n, m));
+
+        auto mat = matrixmod2::uniform_mat(n, m, k, gen);
 
         ASSERT_EQ(your_mat.rank(mat), k);
     }
@@ -84,14 +89,15 @@ TYPED_TEST_P(MatrixMod2Test, RankStressTest) {
 
 TYPED_TEST_P(MatrixMod2Test, LinearEquationStressTest) {
     using Vec = std::vector<int>;
-    using Mat = std::vector<Vec>;
 
     TypeParam your_mat;
     algotest::random::Random gen;
     for (int ph = 0; ph < 200; ph++) {
         int n = gen.uniform(1, 20);
         int m = gen.uniform(1, 20);
-        Mat mat = Mat(n, Vec(m));
+        int k = gen.uniform(1, std::min(n, m));
+        auto mat = matrixmod2::uniform_mat(n, m, k, gen);
+
         Vec ans(m);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
