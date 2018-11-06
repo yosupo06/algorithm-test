@@ -33,65 +33,68 @@ class MatrixModTest : public ::testing::Test {};
 
 TYPED_TEST_CASE_P(MatrixModTest);
 
-TYPED_TEST_P(MatrixModTest, RankStressTest) {
-    using ll = long long;
-    using Vec = std::vector<ll>;
-    using Mat = std::vector<Vec>;
-    constexpr ll kMod = MatrixModTesterBase::kMod;
+namespace matrixmod {
+using ll = long long;
+using Vec = std::vector<ll>;
+using Mat = std::vector<Vec>;
+constexpr ll kMod = MatrixModTesterBase::kMod;
 
-    TypeParam your_mat;
-    algotest::random::Random gen;
-    for (int ph = 0; ph < 200; ph++) {
-        int n = gen.uniform(1, 20);
-        int m = gen.uniform(n, 20);
-        int k = gen.uniform(1, n);
-        Mat mat = Mat(n, Vec(m));
-        for (int i = 0; i < k; i++) {
-            mat[i][i] = 1;
-            for (int j = i + 1; j < m; j++) {
-                mat[i][j] = gen.uniform(0LL, kMod - 1);
+template <class RNG>
+Mat uniform_mat(int n, int m, int k, RNG& gen) {
+    assert(k <= std::min(n, m));
+    Mat mat = Mat(n, Vec(m));
+    for (int i = 0; i < k; i++) {
+        mat[i][i] = 1;
+        for (int j = i + 1; j < m; j++) {
+            mat[i][j] = gen.uniform(0LL, kMod - 1);
+        }
+    }
+    for (int i = k; i < n; i++) {
+        for (int j = 0; j < k; j++) {
+            ll freq = gen.uniform(0LL, kMod - 1);
+            for (int k = 0; k < m; k++) {
+                mat[i][k] += freq * mat[j][k];
+                mat[i][k] %= kMod;
             }
         }
-        for (int i = k; i < n; i++) {
-            for (int j = 0; j < k; j++) {
-                ll freq = gen.uniform(0LL, kMod - 1);
-                for (int k = 0; k < m; k++) {
-                    mat[i][k] += freq * mat[j][k];
-                    mat[i][k] %= kMod;
-                }
-            }
-        }
-
-        for (int tm = 0; tm < 100; tm++) {
+    }
+    for (int tm = 0; tm < (n + m) * 10; tm++) {
+        if (gen.uniform_bool()) {
             int a = gen.uniform(0, n - 1);
             int b = gen.uniform(0, n - 1);
             ll freq = gen.uniform(0LL, kMod - 1);
             if (a == b && freq == kMod - 1)
                 continue;
-            if (gen.uniform_bool()) {
-                for (int i = 0; i < m; i++) {
-                    mat[a][i] += freq * mat[b][i];
-                    mat[a][i] %= kMod;
-                }
-            } else {
-                for (int i = 0; i < n; i++) {
-                    mat[i][a] += freq * mat[i][b];
-                    mat[i][a] %= kMod;
-                }
+            for (int i = 0; i < m; i++) {
+                mat[a][i] += freq * mat[b][i];
+                mat[a][i] %= kMod;
             }
-        }
-
-        if (gen.uniform_bool()) {
-            // trans
-            Mat _mat = mat;
-            mat = Mat(m, Vec(n));
+        } else {
+            int a = gen.uniform(0, m - 1);
+            int b = gen.uniform(0, m - 1);
+            ll freq = gen.uniform(0LL, kMod - 1);
+            if (a == b && freq == kMod - 1)
+                continue;
             for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    mat[j][i] = _mat[i][j];
-                }
+                mat[i][a] += freq * mat[i][b];
+                mat[i][a] %= kMod;
             }
         }
+    }
 
+    return mat;
+}
+
+}  // namespace matrixmod
+
+TYPED_TEST_P(MatrixModTest, RankStressTest) {
+    TypeParam your_mat;
+    algotest::random::Random gen;
+    for (int ph = 0; ph < 200; ph++) {
+        int n = gen.uniform(1, 20);
+        int m = gen.uniform(1, 20);
+        int k = gen.uniform(1, std::min(n, m));
+        auto mat = matrixmod::uniform_mat(n, m, k, gen);
         ASSERT_EQ(your_mat.rank(mat), k);
     }
 }
@@ -142,21 +145,17 @@ TYPED_TEST_P(MatrixModTest, DetStressTest) {
 TYPED_TEST_P(MatrixModTest, LinearEquationStressTest) {
     using ll = long long;
     using Vec = std::vector<ll>;
-    using Mat = std::vector<Vec>;
     constexpr ll kMod = MatrixModTesterBase::kMod;
 
     TypeParam your_mat;
     algotest::random::Random gen;
-    for (int ph = 0; ph < 200; ph++) {
+    for (int ph = 0; ph < 400; ph++) {
         int n = gen.uniform(1, 20);
         int m = gen.uniform(1, 20);
-        Mat mat = Mat(n, Vec(m));
+        int k = gen.uniform(1, std::min(n, m));
+        auto mat = matrixmod::uniform_mat(n, m, k, gen);
+
         Vec ans(m);
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                mat[i][j] = gen.uniform(0LL, kMod - 1);
-            }
-        }
         for (int j = 0; j < m; j++) {
             ans[j] = gen.uniform(0LL, kMod - 1);
         }
@@ -182,42 +181,14 @@ TYPED_TEST_P(MatrixModTest, LinearEquationStressTest) {
 
 TYPED_TEST_P(MatrixModTest, InverseStressTest) {
     using ll = long long;
-    using Vec = std::vector<ll>;
-    using Mat = std::vector<Vec>;
     constexpr ll kMod = MatrixModTesterBase::kMod;
 
     TypeParam your_mat;
     algotest::random::Random gen;
     for (int ph = 0; ph < 200; ph++) {
         int n = gen.uniform(1, 20);
-        Mat mat = Mat(n, Vec(n));
-        ll base = 1;
-        for (int i = 0; i < n; i++) {
-            mat[i][i] = gen.uniform(1LL, kMod - 1);
-            base *= mat[i][i];
-            base %= kMod;
-            for (int j = i + 1; j < n; j++) {
-                mat[i][j] = gen.uniform(0LL, kMod - 1);
-            }
-        }
-        for (int tm = 0; tm < 100; tm++) {
-            int a = gen.uniform(0, n - 1);
-            int b = gen.uniform(0, n - 1);
-            ll freq = gen.uniform(0LL, kMod - 1);
-            if (a == b)
-                continue;
-            if (gen.uniform_bool()) {
-                for (int i = 0; i < n; i++) {
-                    mat[a][i] += freq * mat[b][i];
-                    mat[a][i] %= kMod;
-                }
-            } else {
-                for (int i = 0; i < n; i++) {
-                    mat[i][a] += freq * mat[i][b];
-                    mat[i][a] %= kMod;
-                }
-            }
-        }
+        auto mat = matrixmod::uniform_mat(n, n, n, gen);
+
         auto out = your_mat.inverse(mat);
 
         for (int i = 0; i < n; i++) {

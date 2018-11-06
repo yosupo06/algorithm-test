@@ -19,7 +19,7 @@ class PolyTesterBase {
                                        std::vector<long long> b) = 0;
     // a, bを多項式として見たときの積を返す(MOD 998244353)
     virtual std::vector<long long> mul(std::vector<long long> a,
-                                         std::vector<long long> b) = 0;
+                                       std::vector<long long> b) = 0;
 };
 
 }  // namespace algotest
@@ -51,11 +51,14 @@ TYPED_TEST_P(PolyTest, AddStressTest) {
             V ans(std::max(a_sz, b_sz));
             for (int i = 0; i < std::max(a_sz, b_sz); i++) {
                 ans[i] = 0;
-                if (i < a_sz) ans[i] += a[i];
-                if (i < b_sz) ans[i] += b[i];
+                if (i < a_sz)
+                    ans[i] += a[i];
+                if (i < b_sz)
+                    ans[i] += b[i];
                 ans[i] %= kMod;
             }
-            while (ans.back() == 0) ans.pop_back();
+            while (ans.back() == 0)
+                ans.pop_back();
             auto out = your_poly.add(a, b);
             ASSERT_EQ(ans, out);
         }
@@ -80,11 +83,14 @@ TYPED_TEST_P(PolyTest, SubStressTest) {
             V ans(std::max(a_sz, b_sz));
             for (int i = 0; i < std::max(a_sz, b_sz); i++) {
                 ans[i] = 0;
-                if (i < a_sz) ans[i] += a[i];
-                if (i < b_sz) ans[i] += kMod - b[i];
+                if (i < a_sz)
+                    ans[i] += a[i];
+                if (i < b_sz)
+                    ans[i] += kMod - b[i];
                 ans[i] %= kMod;
             }
-            while (ans.back() == 0) ans.pop_back();
+            while (ans.back() == 0)
+                ans.pop_back();
             auto out = your_poly.sub(a, b);
             ASSERT_EQ(ans, out);
         }
