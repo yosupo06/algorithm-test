@@ -99,6 +99,19 @@ TYPED_TEST_P(MatrixModTest, RankStressTest) {
     }
 }
 
+TYPED_TEST_P(MatrixModTest, DetSpecial) {
+    using ll = long long;
+    using Vec = std::vector<ll>;
+    using Mat = std::vector<Vec>;
+    constexpr ll kMod = MatrixModTesterBase::kMod;
+
+    Mat mat(2, Vec(2));
+    mat[0][1] = mat[1][0] = 1;
+
+    TypeParam your_mat;
+    ASSERT_EQ(your_mat.det(mat), kMod - 1);
+}
+
 TYPED_TEST_P(MatrixModTest, DetStressTest) {
     using ll = long long;
     using Vec = std::vector<ll>;
@@ -207,6 +220,7 @@ TYPED_TEST_P(MatrixModTest, InverseStressTest) {
 
 REGISTER_TYPED_TEST_CASE_P(MatrixModTest,
                            RankStressTest,
+                           DetSpecial,
                            DetStressTest,
                            LinearEquationStressTest,
                            InverseStressTest);
