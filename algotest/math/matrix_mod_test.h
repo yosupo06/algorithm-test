@@ -22,16 +22,25 @@ class MatrixModTesterBase {
         std::vector<std::vector<long long>> mat) = 0;
 };
 
+template <class MATRIX>
+class MatrixModRankTest : public ::testing::Test {};
+template <class MATRIX>
+class MatrixModDetTest : public ::testing::Test {};
+template <class MATRIX>
+class MatrixModLinearEquationTest : public ::testing::Test {};
+template <class MATRIX>
+class MatrixModInverseTest : public ::testing::Test {};
+
 }  // namespace algotest
 
 #include "../random.h"
 
 namespace algotest {
 
-template <class MATRIX>
-class MatrixModTest : public ::testing::Test {};
-
-TYPED_TEST_CASE_P(MatrixModTest);
+TYPED_TEST_CASE_P(MatrixModRankTest);
+TYPED_TEST_CASE_P(MatrixModDetTest);
+TYPED_TEST_CASE_P(MatrixModLinearEquationTest);
+TYPED_TEST_CASE_P(MatrixModInverseTest);
 
 namespace matrixmod {
 using ll = long long;
@@ -87,7 +96,7 @@ Mat uniform_mat(int n, int m, int k, RNG& gen) {
 
 }  // namespace matrixmod
 
-TYPED_TEST_P(MatrixModTest, RankStressTest) {
+TYPED_TEST_P(MatrixModRankTest, RankStressTest) {
     TypeParam your_mat;
     algotest::random::Random gen;
     for (int ph = 0; ph < 200; ph++) {
@@ -99,7 +108,7 @@ TYPED_TEST_P(MatrixModTest, RankStressTest) {
     }
 }
 
-TYPED_TEST_P(MatrixModTest, DetSpecial) {
+TYPED_TEST_P(MatrixModDetTest, DetSpecial) {
     using ll = long long;
     using Vec = std::vector<ll>;
     using Mat = std::vector<Vec>;
@@ -112,7 +121,7 @@ TYPED_TEST_P(MatrixModTest, DetSpecial) {
     ASSERT_EQ(your_mat.det(mat), kMod - 1);
 }
 
-TYPED_TEST_P(MatrixModTest, DetStressTest) {
+TYPED_TEST_P(MatrixModDetTest, DetStressTest) {
     using ll = long long;
     using Vec = std::vector<ll>;
     using Mat = std::vector<Vec>;
@@ -155,7 +164,7 @@ TYPED_TEST_P(MatrixModTest, DetStressTest) {
     }
 }
 
-TYPED_TEST_P(MatrixModTest, LinearEquationStressTest) {
+TYPED_TEST_P(MatrixModLinearEquationTest, LinearEquationStressTest) {
     using ll = long long;
     using Vec = std::vector<ll>;
     constexpr ll kMod = MatrixModTesterBase::kMod;
@@ -192,7 +201,7 @@ TYPED_TEST_P(MatrixModTest, LinearEquationStressTest) {
     }
 }
 
-TYPED_TEST_P(MatrixModTest, InverseStressTest) {
+TYPED_TEST_P(MatrixModInverseTest, InverseStressTest) {
     using ll = long long;
     constexpr ll kMod = MatrixModTesterBase::kMod;
 
@@ -218,11 +227,10 @@ TYPED_TEST_P(MatrixModTest, InverseStressTest) {
     }
 }
 
-REGISTER_TYPED_TEST_CASE_P(MatrixModTest,
-                           RankStressTest,
-                           DetSpecial,
-                           DetStressTest,
-                           LinearEquationStressTest,
-                           InverseStressTest);
+REGISTER_TYPED_TEST_CASE_P(MatrixModRankTest, RankStressTest);
+REGISTER_TYPED_TEST_CASE_P(MatrixModDetTest, DetStressTest, DetSpecial);
+REGISTER_TYPED_TEST_CASE_P(MatrixModLinearEquationTest,
+                           LinearEquationStressTest);
+REGISTER_TYPED_TEST_CASE_P(MatrixModInverseTest, InverseStressTest);
 
 }  // namespace algotest
