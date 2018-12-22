@@ -61,9 +61,9 @@ Mat uniform_mat(int n, int m, int k, RNG& gen) {
     for (int i = k; i < n; i++) {
         for (int j = 0; j < k; j++) {
             ll freq = gen.uniform(0LL, kMod - 1);
-            for (int k = 0; k < m; k++) {
-                mat[i][k] += freq * mat[j][k];
-                mat[i][k] %= kMod;
+            for (int l = 0; l < m; l++) {
+                mat[i][l] += freq * mat[j][l];
+                mat[i][l] %= kMod;
             }
         }
     }

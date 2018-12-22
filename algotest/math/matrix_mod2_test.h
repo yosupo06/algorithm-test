@@ -30,17 +30,17 @@ using Vec = std::vector<int>;
 using Mat = std::vector<Vec>;
 
 template <class RNG>
-Mat uniform_mat(int n, int m, int k, RNG& gen) {
-    assert(k <= std::min(n, m));
+Mat uniform_mat(int n, int m, int r, RNG& gen) {
+    assert(r <= std::min(n, m));
     Mat mat = Mat(n, Vec(m));
-    for (int i = 0; i < k; i++) {
+    for (int i = 0; i < r; i++) {
         mat[i][i] = 1;
         for (int j = i + 1; j < m; j++) {
             mat[i][j] = gen.uniform_bool();
         }
     }
-    for (int i = k; i < n; i++) {
-        for (int j = 0; j < k; j++) {
+    for (int i = r; i < n; i++) {
+        for (int j = 0; j < r; j++) {
             int freq = gen.uniform_bool();
             for (int k = 0; k < m; k++) {
                 mat[i][k] ^= freq * mat[j][k];

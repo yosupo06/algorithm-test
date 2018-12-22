@@ -49,12 +49,12 @@ TYPED_TEST_P(FenwickTest, StressTest) {
     for (int tc = 0; tc < 100; tc++) {
         TypeParam your_fenwick;
         int n = gen.uniform(1, 100);
-        std::vector<long long> a(n);
+        std::vector<long long> v(n);
         for (int i = 0; i < n; i++) {
-            a[i] = gen.uniform(0, 1000000000);
+            v[i] = gen.uniform(0, 1000000000);
         }
-        your_fenwick.setup(a);
-        FenwickNaive fw(a);
+        your_fenwick.setup(v);
+        FenwickNaive fw(v);
         int q = gen.uniform(1, 100);
         for (int ph = 0; ph < q; ph++) {
             int ty = gen.uniform(0, 1);
