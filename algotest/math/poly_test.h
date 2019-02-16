@@ -20,6 +20,8 @@ class PolyTesterBase {
     // a, bを多項式として見たときの積を返す(MOD 998244353)
     virtual std::vector<long long> mul(std::vector<long long> a,
                                        std::vector<long long> b) = 0;
+    virtual std::vector<long long> div(std::vector<long long> a,
+                                       std::vector<long long> b) = 0;
 };
 
 }  // namespace algotest
@@ -127,6 +129,27 @@ TYPED_TEST_P(PolyTest, MulStressTest) {
     }
 }
 
-REGISTER_TYPED_TEST_CASE_P(PolyTest, AddStressTest, SubStressTest, MulStressTest);
+TYPED_TEST_P(PolyTest, DivMulStressTest) {
+    using ll = long long;
+    using V = std::vector<ll>;
+    static const int N = 30;
+    constexpr ll kMod = PolyTesterBase::kMod;
+    algotest::random::Random gen;
+
+    for (int a_sz = 1; a_sz < N; a_sz++) {
+        for (int b_sz = 1; b_sz < N; b_sz++) {
+            TypeParam your_poly;
+            V a(a_sz), b(b_sz);
+            for (int i = 0; i < a_sz; i++)
+                a[i] = gen.uniform(1LL, kMod - 1);
+            for (int i = 0; i < b_sz; i++)
+                b[i] = gen.uniform(1LL, kMod - 1);
+            auto c = your_poly.div(your_poly.mul(a, b), b);
+            ASSERT_EQ(a, c);
+        }
+    }
+}
+
+REGISTER_TYPED_TEST_CASE_P(PolyTest, AddStressTest, SubStressTest, MulStressTest, DivMulStressTest);
 
 }  // namespace algotest
