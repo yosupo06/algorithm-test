@@ -46,6 +46,7 @@ TYPED_TEST_P(PrimeTest, IsPrimeTest) {
     ASSERT_TRUE(your_prime.is_prime(5));
     ASSERT_TRUE(your_prime.is_prime(103));
     ASSERT_FALSE(your_prime.is_prime(103 * 107));
+    ASSERT_FALSE(your_prime.is_prime(31 * 151));
 }
 
 TYPED_TEST_P(PrimeTest, PollardTest) {
