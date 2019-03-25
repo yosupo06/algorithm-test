@@ -22,6 +22,10 @@ class PolyTesterBase {
                                        std::vector<long long> b) = 0;
     virtual std::vector<long long> div(std::vector<long long> a,
                                        std::vector<long long> b) = 0;
+    virtual std::vector<long long> inv(std::vector<long long> a,
+                                       size_t b) = 0;
+    virtual std::vector<long long> sqrt(std::vector<long long> a,
+                                       size_t b) = 0;
 };
 
 }  // namespace algotest
@@ -150,6 +154,56 @@ TYPED_TEST_P(PolyTest, DivMulStressTest) {
     }
 }
 
-REGISTER_TYPED_TEST_CASE_P(PolyTest, AddStressTest, SubStressTest, MulStressTest, DivMulStressTest);
+
+TYPED_TEST_P(PolyTest, InvStressTest) {
+    using ll = long long;
+    using V = std::vector<ll>;
+    static const int N = 30;
+    constexpr ll kMod = PolyTesterBase::kMod;
+    algotest::random::Random gen;
+
+    for (int a_sz = 1; a_sz < N; a_sz++) {
+        for (size_t b_sz = 1; b_sz < N; b_sz++) {
+            TypeParam your_poly;
+            V a(a_sz);
+            for (int i = 0; i < a_sz; i++)
+                a[i] = gen.uniform(1LL, kMod - 1);
+            auto c = your_poly.mul(a, your_poly.inv(a, b_sz));
+
+
+
+            ASSERT_EQ(c[0], 1);
+            for (size_t i = 1; i < std::min(c.size(), b_sz); i++) {
+                ASSERT_EQ(c[i], 0);
+            }
+        }
+    }
+}
+
+
+TYPED_TEST_P(PolyTest, SqrtStressTest) {
+    using ll = long long;
+    using V = std::vector<ll>;
+    static const int N = 30;
+    constexpr ll kMod = PolyTesterBase::kMod;
+    algotest::random::Random gen;
+
+    for (int a_sz = 1; a_sz < N; a_sz++) {
+        for (size_t b_sz = 1; b_sz < N; b_sz++) {
+            TypeParam your_poly;
+            V a(a_sz);
+            a[0] = 1;
+            for (int i = 1; i < a_sz; i++)
+                a[i] = gen.uniform(1LL, kMod - 1);
+            auto c = your_poly.mul(your_poly.sqrt(a, b_sz), your_poly.sqrt(a, b_sz));
+
+            for (size_t i = 0; i < std::min({a.size(), c.size(), b_sz}); i++) {
+                ASSERT_EQ(c[i], a[i]);
+            }
+        }
+    }
+}
+
+REGISTER_TYPED_TEST_CASE_P(PolyTest, AddStressTest, SubStressTest, MulStressTest, DivMulStressTest, InvStressTest, SqrtStressTest);
 
 }  // namespace algotest
