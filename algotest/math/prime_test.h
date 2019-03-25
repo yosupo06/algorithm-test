@@ -37,14 +37,19 @@ bool eq_v(std::vector<T> v, std::vector<T> w) {
     return true;
 }
 
+bool naive_is_prime(int x) {
+    if (x == 1) return false;
+    for (int i = 2; i * i <= x; i++) {
+        if (x % i == 0) return false;
+    }
+    return true;
+}
+
 TYPED_TEST_P(PrimeTest, IsPrimeTest) {
     TypeParam your_prime;
-    ASSERT_FALSE(your_prime.is_prime(1));
-    ASSERT_TRUE(your_prime.is_prime(2));
-    ASSERT_TRUE(your_prime.is_prime(3));
-    ASSERT_FALSE(your_prime.is_prime(4));
-    ASSERT_TRUE(your_prime.is_prime(5));
-    ASSERT_TRUE(your_prime.is_prime(103));
+    for (int i = 1; i <= 10000; i++) {
+        ASSERT_EQ(naive_is_prime(i), your_prime.is_prime(i));
+    }
     ASSERT_FALSE(your_prime.is_prime(103 * 107));
     ASSERT_FALSE(your_prime.is_prime(31 * 151));
 }
