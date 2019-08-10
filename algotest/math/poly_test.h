@@ -154,6 +154,28 @@ TYPED_TEST_P(PolyTest, DivMulStressTest) {
     }
 }
 
+TYPED_TEST_P(PolyTest, DivMulWithZeroStressTest) {
+    using ll = long long;
+    using V = std::vector<ll>;
+    static const int N = 30;
+    constexpr ll kMod = PolyTesterBase::kMod;
+    algotest::random::Random gen;
+
+    for (int a_sz = 1; a_sz < N; a_sz++) {
+        for (int b_sz = 1; b_sz < N; b_sz++) {
+            TypeParam your_poly;
+            V a(a_sz), b(b_sz);
+            int a_zero = gen.uniform(0, a_sz - 1);
+            int b_zero = gen.uniform(0, b_sz - 1);
+            for (int i = a_zero; i < a_sz; i++)
+                a[i] = gen.uniform(1LL, kMod - 1);
+            for (int i = b_zero; i < b_sz; i++)
+                b[i] = gen.uniform(1LL, kMod - 1);
+            auto c = your_poly.div(your_poly.mul(a, b), b);
+            ASSERT_EQ(a, c);
+        }
+    }
+}
 
 TYPED_TEST_P(PolyTest, InvStressTest) {
     using ll = long long;
@@ -204,6 +226,6 @@ TYPED_TEST_P(PolyTest, SqrtStressTest) {
     }
 }
 
-REGISTER_TYPED_TEST_CASE_P(PolyTest, AddStressTest, SubStressTest, MulStressTest, DivMulStressTest, InvStressTest, SqrtStressTest);
+REGISTER_TYPED_TEST_CASE_P(PolyTest, AddStressTest, SubStressTest, MulStressTest, DivMulStressTest, DivMulWithZeroStressTest, InvStressTest, SqrtStressTest);
 
 }  // namespace algotest
